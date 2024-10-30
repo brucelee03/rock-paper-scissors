@@ -1,10 +1,12 @@
+import {GameImages, RulesCard} from '../styledComponents'
+
 const GameRulesView = () => (
-  <div className="rules-card">
-    <img
+  <RulesCard>
+    <GameImages
       src="https://assets.ccbp.in/frontend/react-js/rock-paper-scissor/rules-image.png"
       alt="rules"
     />
-  </div>
+  </RulesCard>
 )
 
 export default GameRulesView

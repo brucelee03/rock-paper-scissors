@@ -5,7 +5,21 @@ import Popup from 'reactjs-popup'
 import 'reactjs-popup/dist/index.css'
 import {RiCloseLine} from 'react-icons/ri'
 
-import {Score} from '../styledComponents'
+import {
+  GameViewContainer,
+  ScoreBoard,
+  MainHeading,
+  ScoreCard,
+  ScoreLabel,
+  Score,
+  ChoicesButton,
+  GameImages,
+  PlayingContainer,
+  PlayingButtonCard,
+  RulesButton,
+  PopupContainer,
+  CloseButton,
+} from '../styledComponents'
 
 import GameRulesView from '../GameRulesView'
 import GameResultView from '../GameResultView'
@@ -14,34 +28,72 @@ class GamePlayingView extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      myChoice: '',
+      myChoiceId: '',
+      opponentChoiceId:
+        props.choicesList[Math.floor(Math.random() * props.choicesList.length)]
+          .id,
       score: 0,
+      result: '',
       choicesList: props.choicesList,
       showResult: false,
     }
   }
 
   onClickRock = () => {
-    this.setState({showResult: true, myChoice: 'ROCK'})
+    const {opponentChoiceId} = this.state
+    const result = this.getResult('ROCK', opponentChoiceId)
+    this.setState(
+      {
+        showResult: true,
+        myChoiceId: 'ROCK',
+        result,
+      },
+      () => this.updateScore(result),
+    )
   }
 
   onClickScissors = () => {
-    this.setState({showResult: true, myChoice: 'SCISSORS'})
+    const {opponentChoiceId} = this.state
+    const result = this.getResult('SCISSORS', opponentChoiceId)
+    this.setState(
+      {
+        showResult: true,
+        myChoiceId: 'SCISSORS',
+        result,
+      },
+      () => this.updateScore(result),
+    )
   }
 
   onClickPaper = () => {
-    this.setState({showResult: true, myChoice: 'PAPER'})
+    const {opponentChoiceId} = this.state
+    const result = this.getResult('PAPER', opponentChoiceId)
+    this.setState(
+      {
+        showResult: true,
+        myChoiceId: 'PAPER',
+        result,
+      },
+      () => this.updateScore(result),
+    )
   }
 
   onClickPlayAgain = () => {
-    this.setState({myChoice: '', score: 0, showResult: false})
+    const {choicesList} = this.state
+    const newOpponentChoiceId =
+      choicesList[Math.floor(Math.random() * choicesList.length)].id
+    this.setState({
+      myChoiceId: '',
+      showResult: false,
+      opponentChoiceId: newOpponentChoiceId,
+    })
   }
 
-  getResult = (myChoice, opponentChoice) => {
-    if (myChoice === opponentChoice) {
-      return 'IT IS A DRAW'
+  getResult = (myChoiceId, opponentChoice) => {
+    if (myChoiceId === opponentChoice) {
+      return 'IT IS DRAW'
     }
-    switch (myChoice) {
+    switch (myChoiceId) {
       case 'PAPER':
         return opponentChoice === 'ROCK' ? 'YOU WON' : 'YOU LOSE'
       case 'SCISSORS':
@@ -49,7 +101,7 @@ class GamePlayingView extends Component {
       case 'ROCK':
         return opponentChoice === 'SCISSORS' ? 'YOU WON' : 'YOU LOSE'
       default:
-        return 'IT IS A DRAW'
+        return 'IT IS DRAW'
     }
   }
 
@@ -61,103 +113,107 @@ class GamePlayingView extends Component {
     }
   }
 
-  renderPlayingView = () => {
-    const {choicesList} = this.state
-
-    return (
-      <div className="playing-container">
-        <div className="button-container">
-          <button
-            type="button"
-            onClick={this.onClickRock}
-            data-testid="rockButton"
-          >
-            <img src={choicesList[0].imageUrl} alt={choicesList[0].id} />
-          </button>
-          <button
-            type="button"
-            onClick={this.onClickScissors}
-            data-testid="scissorsButton"
-          >
-            <img src={choicesList[1].imageUrl} alt={choicesList[1].id} />
-          </button>
-        </div>
-        <button
-          type="button"
-          onClick={this.onClickPaper}
-          data-testid="paperButton"
-        >
-          <img src={choicesList[2].imageUrl} alt={choicesList[2].id} />
-        </button>
-      </div>
-    )
-  }
-
   render() {
-    const {showResult, choicesList, score, myChoice} = this.state
-
-    const randomIndex = Math.floor(Math.random() * choicesList.length)
-    const opponentChoice = choicesList[randomIndex].id
-    const result = this.getResult(myChoice, opponentChoice)
-
-    if (showResult) {
-      this.updateScore(result)
-    }
+    const {
+      showResult,
+      choicesList,
+      score,
+      myChoiceId,
+      opponentChoiceId,
+      result,
+    } = this.state
 
     return (
-      <div className="game-view-container">
-        <div className="score-board">
-          <div className="game-name-container">
-            <h1>
+      <GameViewContainer>
+        <ScoreBoard>
+          <div>
+            <MainHeading>
               Rock
               <br />
               Paper
               <br /> Scissors
-            </h1>
+            </MainHeading>
           </div>
-          <div className="score-container">
-            <p>Score</p>
-            <Score fontFamily="Roboto">{score}</Score>
-          </div>
-        </div>
+          <ScoreCard>
+            <ScoreLabel>Score</ScoreLabel>
+            <Score>{score}</Score>
+          </ScoreCard>
+        </ScoreBoard>
         {showResult ? (
           <GameResultView
             choicesList={choicesList}
-            myChoiceId={myChoice}
-            opponentChoiceId={opponentChoice}
+            myChoiceId={myChoiceId}
+            opponentChoiceId={opponentChoiceId}
             onPlayAgain={this.onClickPlayAgain}
             gameResult={result}
           />
         ) : (
-          this.renderPlayingView()
+          <PlayingContainer>
+            <PlayingButtonCard className="button-container">
+              <ChoicesButton
+                type="button"
+                onClick={this.onClickRock}
+                data-testid="rockButton"
+              >
+                <GameImages
+                  src={choicesList[0].imageUrl}
+                  alt={choicesList[0].id}
+                />
+              </ChoicesButton>
+              <ChoicesButton
+                type="button"
+                onClick={this.onClickScissors}
+                data-testid="scissorsButton"
+              >
+                <GameImages
+                  src={choicesList[1].imageUrl}
+                  alt={choicesList[1].id}
+                />
+              </ChoicesButton>
+            </PlayingButtonCard>
+            <ChoicesButton
+              type="button"
+              onClick={this.onClickPaper}
+              data-testid="paperButton"
+            >
+              <GameImages
+                src={choicesList[2].imageUrl}
+                alt={choicesList[2].id}
+              />
+            </ChoicesButton>
+          </PlayingContainer>
         )}
 
-        <div>
+        <PopupContainer>
           <Popup
             modal
-            trigger={
-              <button type="button" className="rules-button">
-                RULES
-              </button>
-            }
+            trigger={<RulesButton type="button">RULES</RulesButton>}
             className="popup-content"
+            contentStyle={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
             {close => (
               <>
-                <button
+                <CloseButton
                   type="button"
                   className="close-button"
                   data-testid="closeButton"
                   onClick={() => close()}
                 >
-                  <RiCloseLine className="close-icon" />
-                </button>
+                  <RiCloseLine
+                    styledIcon={{color: '#223a5f', fontSize: '13px'}}
+                  />
+                </CloseButton>
                 <GameRulesView />
               </>
             )}
           </Popup>
-        </div>
-      </div>
+        </PopupContainer>
+      </GameViewContainer>
     )
   }
 }

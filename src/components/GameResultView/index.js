@@ -1,3 +1,13 @@
+import {
+  ResultContainer,
+  GameImages,
+  ResultCard,
+  ResultChoicesCard,
+  Contestant,
+  Result,
+  ResultButton,
+} from '../styledComponents'
+
 const GameResultView = props => {
   const {
     choicesList,
@@ -11,28 +21,27 @@ const GameResultView = props => {
   const opponentChoice = choicesList.find(
     eachItem => eachItem.id === opponentChoiceId,
   )
-
   const onClickPlayAgain = () => {
     onPlayAgain()
   }
 
   return (
-    <div className="result-container">
-      <div className="result-card">
-        <div className="my-choice">
-          <p>YOU</p>
-          <img src={myChoice.imageUrl} alt="your choice" />
-        </div>
-        <div className="opponent-choice">
-          <p>OPPONENT</p>
-          <img src={opponentChoice.imageUrl} alt="opponent choice" />
-        </div>
-      </div>
-      <p>{gameResult}</p>
-      <button type="button" onClick={onClickPlayAgain}>
+    <ResultContainer>
+      <ResultCard>
+        <ResultChoicesCard>
+          <Contestant>YOU</Contestant>
+          <GameImages src={myChoice.imageUrl} alt="your choice" />
+        </ResultChoicesCard>
+        <ResultChoicesCard>
+          <Contestant>OPPONENT</Contestant>
+          <GameImages src={opponentChoice.imageUrl} alt="opponent choice" />
+        </ResultChoicesCard>
+      </ResultCard>
+      <Result>{gameResult}</Result>
+      <ResultButton type="button" onClick={onClickPlayAgain}>
         PLAY AGAIN
-      </button>
-    </div>
+      </ResultButton>
+    </ResultContainer>
   )
 }
 
